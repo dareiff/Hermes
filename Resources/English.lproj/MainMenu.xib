@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G12a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
@@ -384,50 +384,36 @@ MgA3AEEARwBQAFcAXABkAHkAewB9AH8AgQCLAJAAlQCgAKMApQCnAKkArgC5AMIAygDNANYA2wDoAOwA
                         <action selector="toggleSort:" target="537" id="2286"/>
                     </connections>
                 </segmentedControl>
-                <button toolTip="Edit selected station" id="1754">
-                    <rect key="frame" x="63" y="2" width="31" height="20"/>
+                <button toolTip="Edit selected station" verticalHuggingPriority="750" id="1754">
+                    <rect key="frame" x="93" y="-1" width="38" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <buttonCell key="cell" type="square" title="Edit" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1755">
+                    <buttonCell key="cell" type="roundTextured" title="Edit" bezelStyle="texturedRounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1755">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
                         <action selector="editSelected:" target="537" id="1759"/>
                     </connections>
                 </button>
-                <button toolTip="Delete selected station" id="942">
-                    <rect key="frame" x="43" y="2" width="21" height="20"/>
+                <button toolTip="Delete selected station" verticalHuggingPriority="750" id="942">
+                    <rect key="frame" x="59" y="-1" width="21" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <buttonCell key="cell" type="square" title="Remove Station" bezelStyle="shadowlessSquare" image="NSRemoveTemplate" imagePosition="only" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="943">
+                    <buttonCell key="cell" type="roundTextured" alternateTitle="Remove Station" bezelStyle="texturedRounded" image="NSRemoveTemplate" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="943">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
                         <action selector="deleteSelected:" target="537" id="944"/>
-                    </connections>
-                </button>
-                <button toolTip="Play selected station" id="939">
-                    <rect key="frame" x="0.0" y="2" width="21" height="20"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <buttonCell key="cell" type="square" title="Play Station" bezelStyle="shadowlessSquare" image="play" imagePosition="only" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="940">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
-                        <string key="keyEquivalent" base64-UTF8="YES">
-DQ
-</string>
-                    </buttonCell>
-                    <connections>
-                        <action selector="playSelected:" target="537" id="941"/>
                     </connections>
                 </button>
                 <progressIndicator hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="863">
                     <rect key="frame" x="263" y="4" width="16" height="16"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                 </progressIndicator>
-                <button toolTip="Refresh station list" id="860">
-                    <rect key="frame" x="283" y="2" width="20" height="20"/>
+                <button toolTip="Refresh station list" verticalHuggingPriority="750" id="860">
+                    <rect key="frame" x="283" y="-1" width="20" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                    <buttonCell key="cell" type="square" title="Refresh Stations" bezelStyle="shadowlessSquare" image="NSRefreshTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="861">
+                    <buttonCell key="cell" type="roundTextured" alternateTitle="Refresh Stations" bezelStyle="texturedRounded" image="NSRefreshTemplate" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="861">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -438,12 +424,12 @@ DQ
                 <scrollView toolTip="Station list" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="731">
                     <rect key="frame" x="0.0" y="25" width="303" height="248"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                    <clipView key="contentView" id="Qxl-WA-Sas">
+                    <clipView key="contentView" copiesOnScroll="NO" id="Qxl-WA-Sas">
                         <rect key="frame" x="1" y="1" width="301" height="246"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" id="734" customClass="StationsTableView">
-                                <rect key="frame" x="0.0" y="0.0" width="301" height="19"/>
+                                <rect key="frame" x="0.0" y="0.0" width="301" height="246"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -497,15 +483,29 @@ DQ
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                 </scrollView>
-                <button toolTip="Add a new station" id="898">
-                    <rect key="frame" x="24" y="2" width="20" height="20"/>
+                <button toolTip="Add a new station" verticalHuggingPriority="750" id="898">
+                    <rect key="frame" x="36" y="-1" width="21" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <buttonCell key="cell" type="square" title="Add Station" bezelStyle="shadowlessSquare" image="NSAddTemplate" imagePosition="only" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="899">
+                    <buttonCell key="cell" type="roundTextured" alternateTitle="Add Station" bezelStyle="texturedRounded" image="NSAddTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="899">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
                         <action selector="addStation:" target="537" id="920"/>
+                    </connections>
+                </button>
+                <button toolTip="Play selected station" verticalHuggingPriority="750" id="939">
+                    <rect key="frame" x="2" y="-1" width="31" height="25"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <buttonCell key="cell" type="roundTextured" alternateTitle="Play Station" bezelStyle="texturedRounded" image="play" imagePosition="only" alignment="center" alternateImage="Pandora-Menu-Dark-Play" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="940">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                        <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                    </buttonCell>
+                    <connections>
+                        <action selector="playSelected:" target="537" id="941"/>
                     </connections>
                 </button>
             </subviews>
@@ -546,9 +546,9 @@ DQ
                     </scroller>
                 </scrollView>
                 <button toolTip="Go to selected artist's page on Pandora" verticalHuggingPriority="750" id="2195">
-                    <rect key="frame" x="20" y="1" width="21" height="20"/>
+                    <rect key="frame" x="21" y="-2" width="21" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <buttonCell key="cell" type="smallSquare" title="Gradient Button" bezelStyle="smallSquare" image="NSUser" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2196">
+                    <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="NSUser" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2196">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -557,9 +557,9 @@ DQ
                     </connections>
                 </button>
                 <button toolTip="Go to selected song's page on Pandora" verticalHuggingPriority="750" id="2204">
-                    <rect key="frame" x="0.0" y="1" width="21" height="20"/>
+                    <rect key="frame" x="0.0" y="-2" width="21" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <buttonCell key="cell" type="smallSquare" title="Gradient Button" bezelStyle="smallSquare" image="music-note" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2205">
+                    <buttonCell key="cell" type="roundTextured" alternateTitle="Go to selected song's page on pandora" bezelStyle="texturedRounded" image="music-note" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2205">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -568,9 +568,9 @@ DQ
                     </connections>
                 </button>
                 <button toolTip="Go to selected album's page on Pandora" verticalHuggingPriority="750" id="2197">
-                    <rect key="frame" x="40" y="1" width="21" height="20"/>
+                    <rect key="frame" x="42" y="-2" width="21" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <buttonCell key="cell" type="smallSquare" title="Gradient Button" bezelStyle="smallSquare" image="cd" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2198">
+                    <buttonCell key="cell" type="roundTextured" alternateTitle="CD" bezelStyle="texturedRounded" image="cd" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2198">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -579,9 +579,9 @@ DQ
                     </connections>
                 </button>
                 <button toolTip="View selected song's lyrics" verticalHuggingPriority="750" id="2265">
-                    <rect key="frame" x="60" y="1" width="21" height="20"/>
+                    <rect key="frame" x="63" y="-2" width="21" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <buttonCell key="cell" type="smallSquare" title="Gradient Button" bezelStyle="smallSquare" image="NSFontPanel" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2266">
+                    <buttonCell key="cell" type="roundTextured" alternateTitle="View selected song’s lyrics" bezelStyle="texturedRounded" image="NSFontPanel" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2266">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -590,10 +590,10 @@ DQ
                     </connections>
                 </button>
                 <button toolTip="Dislike selected song" verticalHuggingPriority="750" id="2199">
-                    <rect key="frame" x="276" y="1" width="21" height="20"/>
+                    <rect key="frame" x="275" y="-2" width="21" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                    <buttonCell key="cell" type="smallSquare" title="Gradient Button" bezelStyle="smallSquare" image="thumbdown" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2200">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                    <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="thumbdown" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2200">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
@@ -601,10 +601,10 @@ DQ
                     </connections>
                 </button>
                 <button toolTip="Like selected song" verticalHuggingPriority="750" id="2201">
-                    <rect key="frame" x="256" y="1" width="21" height="20"/>
+                    <rect key="frame" x="255" y="-2" width="21" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                    <buttonCell key="cell" type="smallSquare" title="Gradient Button" bezelStyle="smallSquare" image="thumbup" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2202">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                    <buttonCell key="cell" type="roundTextured" alternateTitle="Thumb's up" bezelStyle="texturedRounded" image="thumbup" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2202">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
@@ -1704,7 +1704,7 @@ DQ
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" indentationPerLevel="16" outlineTableColumn="1683" id="1679">
-                                                        <rect key="frame" x="0.0" y="0.0" width="198" height="149"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="198" height="20"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="2" height="3"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1750,7 +1750,7 @@ DQ
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" indentationPerLevel="16" outlineTableColumn="1692" id="1688">
-                                                        <rect key="frame" x="0.0" y="0.0" width="198" height="149"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="198" height="20"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="2" height="3"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -2255,6 +2255,7 @@ DQ
         <image name="NSRefreshTemplate" width="11" height="15"/>
         <image name="NSRemoveTemplate" width="11" height="11"/>
         <image name="NSUser" width="32" height="32"/>
+        <image name="Pandora-Menu-Dark-Play" width="420" height="420"/>
         <image name="cd" width="512" height="512"/>
         <image name="error_icon" width="128" height="128"/>
         <image name="fast_forward" width="128" height="128"/>
