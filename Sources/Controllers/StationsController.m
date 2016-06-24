@@ -19,41 +19,41 @@
     addObserver:self
     selector:@selector(stationsLoaded:)
     name:PandoraDidLoadStationsNotification
-    object:[[NSApp delegate] pandora]];
+    object:nil];
 
   [[NSNotificationCenter defaultCenter]
     addObserver:self
     selector:@selector(searchResultsLoaded:)
     name:PandoraDidLoadSearchResultsNotification
-    object:[[NSApp delegate] pandora]];
+    object:nil];
   [[NSNotificationCenter defaultCenter]
     addObserver:self
     selector:@selector(genreStationsLoaded:)
     name:PandoraDidLoadGenreStationsNotification
-    object:[[NSApp delegate] pandora]];
+    object:nil];
 
   [[NSNotificationCenter defaultCenter]
     addObserver:self
     selector:@selector(stationCreated:)
     name:PandoraDidCreateStationNotification
-    object:[[NSApp delegate] pandora]];
+    object:nil];
 
   [[NSNotificationCenter defaultCenter]
     addObserver:self
     selector:@selector(stationRemoved:)
     name:PandoraDidDeleteStationNotification
-    object:[[NSApp delegate] pandora]];
+    object:nil];
   [[NSNotificationCenter defaultCenter]
     addObserver:self
     selector:@selector(stationRemoved:)
     name:PandoraDidLogOutNotification
-    object:[[NSApp delegate] pandora]];
+    object:nil];
 
   [[NSNotificationCenter defaultCenter]
     addObserver:self
     selector:@selector(stationRenamed:)
     name:PandoraDidDeleteFeedbackNotification
-    object:[[NSApp delegate] pandora]];
+    object:nil];
 
   return self;
 }
@@ -138,6 +138,8 @@
     [stationsTable
      selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
      byExtendingSelection:NO];
+    [stationsTable scrollRowToVisible:index];
+    [self tableViewSelectionDidChange:nil];
   }
 }
 
@@ -305,11 +307,20 @@
 
 #pragma mark - NSOutlineViewDelegate
 - (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item {
-  return [item isKindOfClass:[NSString class]];
+  if (outlineView == results)
+    return [item isKindOfClass:[NSString class]];
+  else if (outlineView == genres)
+    return [item isKindOfClass:[NSDictionary class]] && item[@"categoryName"] != nil;
+  return NO;
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item {
-  return ![item isKindOfClass:[NSString class]];
+  return ![self outlineView:outlineView isGroupItem:item];
+}
+
+- (void)outlineViewSelectionDidChange:(NSNotification *)notification {
+  NSOutlineView *outlineView = [notification object];
+  [[outlineView target] setEnabled:[outlineView selectedRow] != -1];
 }
 
 #pragma mark - Other callbacks
@@ -330,6 +341,7 @@
 - (void) stationRemoved: (NSNotification*) not {
   [stationsRefreshing setHidden:YES];
   [stationsRefreshing stopAnimation:nil];
+  [stationsTable deselectAll:nil];
   [stationsTable reloadData];
 }
 
@@ -356,7 +368,7 @@
   [stationsRefreshing stopAnimation:nil];
 
   if ([self playingStation] == nil && ![self playSavedStation]) {
-    [[NSApp delegate] setCurrentView:view];
+    [[NSApp delegate] setCurrentView:chooseStationView];
     [[NSApp delegate] showStationsDrawer:nil];
   }
   [[NSApp delegate] handleDrawer];
@@ -386,6 +398,9 @@
 
 /* Called whenever search results are received */
 - (void) searchResultsLoaded: (NSNotification*) not {
+  if (![not.object isEqualToString:[search stringValue]])
+    return;
+
   lastResults = [not userInfo];
 
   [searchSpinner setHidden:YES];
@@ -402,7 +417,16 @@
 }
 
 - (void) genreStationsLoaded: (NSNotification*) not {
-  genreResults = [not userInfo][@"categories"];
+  NSArray *categories = [not userInfo][@"categories"];
+  NSMutableArray *mutableCategories = [[NSMutableArray alloc] initWithCapacity:[categories count]];
+  for (NSDictionary *category in categories) {
+    NSMutableDictionary *mutableCategory = [category mutableCopy];
+    mutableCategory[@"stations"] = [category[@"stations"] sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull s1, id  _Nonnull s2) {
+      return [s1[@"stationName"] localizedStandardCompare:s2[@"stationName"]];
+    }];
+    [mutableCategories addObject:[mutableCategory copy]];
+  }
+  genreResults = [mutableCategories copy];
   [genres reloadData];
   [genreSpinner stopAnimation:nil];
   [genreSpinner setHidden:YES];
@@ -500,7 +524,7 @@
   }
 
   NSAlert *alert = [NSAlert new];
-  alert.messageText = @"Are you sure you want to permanently delete this station?";
+  alert.messageText = [NSString stringWithFormat:@"Are you sure you want to permanently delete the station “%@”?", selected.name];
   [alert addButtonWithTitle:@"Cancel"];
   [alert addButtonWithTitle:@"Delete"];
   alert.alertStyle = NSWarningAlertStyle;
@@ -511,8 +535,9 @@
       return;
     
     if ([selected isEqual:[self playingStation]]) {
-      [[[NSApp delegate] playback] playStation:nil];
-      [[NSApp delegate] setCurrentView:view];
+      HermesAppDelegate *delegate = [NSApp delegate];
+      [[delegate playback] playStation:nil];
+      [delegate setCurrentView:chooseStationView];
     }
     
     [stationsRefreshing setHidden:NO];

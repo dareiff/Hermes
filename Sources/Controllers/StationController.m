@@ -23,7 +23,6 @@
 
 - (id) init {
   NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-  Pandora *pandora = [[NSApp delegate] pandora];
   [center addObserver:self
              selector:@selector(stationInfo:)
                  name:PandoraDidLoadStationInfoNotification
@@ -31,30 +30,38 @@
   [center addObserver:self
              selector:@selector(hideSpinner)
                  name:PandoraDidRenameStationNotification
-               object:pandora];
+               object:nil];
   [center addObserver:self
-             selector:@selector(hideSpinner)
+             selector:@selector(feedbackDeleted:)
                  name:PandoraDidDeleteFeedbackNotification
-               object:pandora];
+               object:nil];
   [center addObserver:self
              selector:@selector(searchCompleted:)
                  name:PandoraDidLoadSearchResultsNotification
-               object:pandora];
+               object:nil];
   [center addObserver:self
              selector:@selector(seedAdded:)
                  name:PandoraDidAddSeedNotification
-               object:pandora];
+               object:nil];
   [center addObserver:self
              selector:@selector(seedDeleted:)
                  name:PandoraDidDeleteSeedNotification
-               object:pandora];
+               object:nil];
+  [center addObserver:self
+             selector:@selector(stationRemoved:)
+                 name:PandoraDidDeleteStationNotification
+               object:nil];
+  [center addObserver:self
+             selector:@selector(songRated:)
+                 name:PandoraDidRateSongNotification
+               object:nil];
   return [super init];
 }
 
 /**
  * @brief Begin editing a station by displaying all the necessary dialogs
  *
- * @param station the station to edit
+ * @param station the station to edit (nil to close editor, e.g. if station is deleted)
  */
 - (void) editStation: (Station*) station {
   [stationName setEnabled:FALSE];
@@ -62,9 +69,11 @@
   [stationCreated setStringValue:@""];
   [stationGenres setStringValue:@""];
   [art setImage:nil];
-  [progress setHidden:FALSE];
-  [progress startAnimation:nil];
-  [[[NSApp delegate] pandora] fetchStationInfo: station];
+  if (station != nil) {
+    [progress setHidden:FALSE];
+    [progress startAnimation:nil];
+    [[[NSApp delegate] pandora] fetchStationInfo: station];
+  }
   cur_station = station;
   station_url = nil;
 
@@ -79,9 +88,12 @@
   lastResults = nil;
   [seedsCurrent reloadData];
   [seedsResults reloadData];
-  [self showSpinner];
-  [window setIsVisible:TRUE];
-  [window makeKeyAndOrderFront:nil];
+  if (station == nil) {
+    [window orderOut:nil];
+  } else {
+    [self showSpinner];
+    [window makeKeyAndOrderFront:nil];
+  }
 }
 
 - (NSArray *)formattedArray:(NSArray *)alikesDislikes forLikesOrDislikes:(NSTableView *)likesDislikes {
@@ -138,21 +150,10 @@
   adislikes = [self formattedArray:info[@"dislikes"] forLikesOrDislikes:dislikes];
   [deleteFeedback setEnabled:TRUE];
   seeds = info[@"seeds"];
-  if ([cur_station allowAddMusic]) {
-    [seedSearch setEnabled:TRUE];
-    [seedAdd setToolTip:@""];
-    [seedDel setToolTip:@""];
-    [seedSearch setToolTip:@""];
-  } else {
-    [seedAdd setEnabled:NO];
-    [seedDel setEnabled:NO];
-    [seedSearch setEnabled:NO];
-    [seedAdd setToolTip:@"Cannot add seeds to this station"];
-    [seedDel setToolTip:@"Cannot modify the seeds of this station"];
-    [seedSearch setToolTip:@"Cannot add seeds to this station"];
-  }
   [likes reloadData];
   [dislikes reloadData];
+  [likes setEnabled:YES];
+  [dislikes setEnabled:YES];
   [seedsCurrent reloadData];
   [seedsResults reloadData];
   [seedsCurrent expandItem:@"songs"];
@@ -180,6 +181,11 @@
   return [mutableSeeds copy];
 }
 
+- (void)stationRemoved:(NSNotification *)notification {
+  if ([notification object] == cur_station)
+    [self editStation:nil];
+}
+
 #pragma mark - Search for a seed
 
 - (IBAction) searchSeeds:(id)sender {
@@ -189,6 +195,8 @@
 }
 
 - (void) searchCompleted:(NSNotification*) not {
+  if (![not.object isEqualToString:[seedSearch stringValue]])
+    return;
   lastResults = [self seedsWithNoEmptyKinds:[not userInfo]];
   [seedsResults deselectAll:nil];
   [seedsResults reloadData];
@@ -308,33 +316,56 @@
   [deleteFeedback setEnabled:TRUE];
 }
 
+#pragma mark - Add feedback
+- (void)songRated:(NSNotification *)notification {
+  Song *song = [notification object];
+  if ([song.stationId isEqualToString:cur_station.stationId]) {
+    [likes setEnabled:NO];
+    [dislikes setEnabled:NO];
+    [progress setHidden:FALSE];
+    [progress startAnimation:nil];
+    [[[NSApp delegate] pandora] fetchStationInfo:cur_station];
+  }
+}
+
 #pragma mark - Delete feedback
 
-- (NSArray*) delfeed:(NSArray*)feed table:(NSTableView*)view {
+- (void)delfeed:(NSArray*)feed table:(NSTableView*)view {
   NSIndexSet *set = [view selectedRowIndexes];
-  if ([set count] == 0) { return feed; }
-  [self showSpinner];
-  Pandora *pandora = [[NSApp delegate] pandora];
+  if ([set count] == 0)
+    return;
 
+  Pandora *pandora = [[NSApp delegate] pandora];
   [set enumerateIndexesUsingBlock: ^(NSUInteger idx, BOOL *stop) {
     NSDictionary *song = feed[idx];
     [pandora deleteFeedback:song[@"feedbackId"]];
   }];
-
-  NSMutableArray *arr = [NSMutableArray array];
-  [arr addObjectsFromArray:feed];
-  [arr removeObjectsAtIndexes:set];
-
-  return arr;
 }
 
 - (IBAction) deleteFeedback:(id)sender {
-  alikes = [self delfeed:alikes table:likes];
-  adislikes = [self delfeed:adislikes table:dislikes];
-  [likes reloadData];
-  [dislikes reloadData];
-  [likes deselectAll:nil];
-  [dislikes deselectAll:nil];
+  [self showSpinner];
+  [self delfeed:alikes table:likes];
+  [self delfeed:adislikes table:dislikes];
+}
+
+- (NSArray *)arrayRemovingFeedbackId:(NSString *)feedbackId fromArray:(NSArray *)array inTableView:(NSTableView *)tableView {
+  NSUInteger indexOfFeedback = [array indexOfObjectPassingTest:^BOOL(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    return [obj[@"feedbackId"] isEqualToString:feedbackId];
+  }];
+  if (indexOfFeedback == NSNotFound)
+    return array;
+  NSMutableArray *mutableArray = [array mutableCopy];
+  [mutableArray removeObjectAtIndex:indexOfFeedback];
+  [tableView reloadData];
+  [tableView deselectAll:nil];
+  return [mutableArray copy];
+}
+
+- (void)feedbackDeleted:(NSNotification *)notification {
+  NSString *feedbackId = [notification object];
+  alikes = [self arrayRemovingFeedbackId:feedbackId fromArray:alikes inTableView:likes];
+  adislikes = [self arrayRemovingFeedbackId:feedbackId fromArray:adislikes inTableView:dislikes];
+  [self hideSpinner];
 }
 
 #pragma mark - NSTableViewDataSource
@@ -445,7 +476,7 @@
     button = seedAdd;
   else if (outlineView == seedsCurrent)
     button = seedDel;
-  [button setEnabled:[cur_station allowAddMusic] && ([outlineView numberOfSelectedRows] > 0)];
+  [button setEnabled:([outlineView numberOfSelectedRows] > 0)];
 }
 
 @end

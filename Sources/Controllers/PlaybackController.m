@@ -61,21 +61,27 @@ BOOL playOnStart = YES;
 
   [center
     addObserver:self
+    selector:@selector(showToolbar)
+    name:PandoraDidAuthenticateNotification
+    object:nil];
+
+  [center
+    addObserver:self
     selector:@selector(hideSpinner)
     name:PandoraDidRateSongNotification
-    object:[[NSApp delegate] pandora]];
+    object:nil];
 
   [center
     addObserver:self
     selector:@selector(hideSpinner)
     name:PandoraDidDeleteFeedbackNotification
-    object:[[NSApp delegate] pandora]];
+    object:nil];
 
   [center
     addObserver:self
     selector:@selector(hideSpinner)
     name:PandoraDidTireSongNotification
-    object:[[NSApp delegate] pandora]];
+    object:nil];
 
   [center
     addObserver:self
@@ -89,16 +95,11 @@ BOOL playOnStart = YES;
      name:StationDidPlaySongNotification
      object:nil];
 
-  CIFilter *volumeSliderFilter = [CIFilter filterWithName:@"CIPhotoEffectMono"]; // 10.9+
+  CIFilter *volumeSliderFilter = [CIFilter filterWithName:@"CIPhotoEffectMono"];
   if (volumeSliderFilter != nil)
     [volume setContentFilters:@[volumeSliderFilter]];
 
-  CIFilter *playbackProgressFilter = [CIFilter filterWithName:@"CIPhotoEffectMono"]; // 10.9+
-  if (playbackProgressFilter == nil) {
-    playbackProgressFilter = [CIFilter filterWithName:@"CIColorMonochrome"];
-    [playbackProgressFilter setDefaults];
-    [playbackProgressFilter setValue:[CIColor colorWithRed:0 green:0 blue:0] forKey:@"inputColor"];
-  }
+  CIFilter *playbackProgressFilter = [CIFilter filterWithName:@"CIPhotoEffectMono"];
   if (playbackProgressFilter != nil)
     [playbackProgress setContentFilters:@[playbackProgressFilter]];
   
@@ -126,6 +127,10 @@ BOOL playOnStart = YES;
   
   // prevent dragging the progress slider
   [playbackProgress setEnabled:NO];
+}
+
+- (void)showToolbar {
+  toolbar.visible = YES;
 }
 
 /* Don't run the timer when playback is paused, the window is hidden, etc. */
@@ -188,13 +193,8 @@ BOOL playOnStart = YES;
 }
 
 - (void) reset {
-  [toolbar setVisible:NO];
-  if (playing) {
-    [playing stop];
-    [[ImageLoader loader] cancel:[[playing playingSong] art]];
-  }
-  playing = nil;
-  lastImgSrc = nil;
+  [self playStation:nil];
+
   NSString *path = [[NSApp delegate] stateDirectory:@"station.savestate"];
   [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
 }
@@ -284,6 +284,8 @@ BOOL playOnStart = YES;
   Song *song = [playing playingSong];
   assert(song != nil);
 
+  song.playDate = [NSDate date];
+
   /* Prevent a flicker by not loading the same image twice */
   if ([song art] != lastImgSrc) {
     if ([song art] == nil || [[song art] isEqual: @""]) {
@@ -346,25 +348,30 @@ BOOL playOnStart = YES;
   [self hideSpinner];
 }
 
-/* Plays a new station */
+/* Plays a new station, or nil to play no station (e.g., if station deleted) */
 - (void) playStation: (Station*) station {
   if ([playing stationId] == [station stationId]) {
     return;
   }
 
-  [playing stop];
-  [[ImageLoader loader] cancel:[[playing playingSong] art]];
-  [[NSApp delegate] setCurrentView:playbackView];
-  [toolbar setVisible:YES];
-
-  if (station == nil) {
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:LAST_STATION_KEY];
-  } else {
-    [[NSUserDefaults standardUserDefaults] setObject:[station stationId]
-                                              forKey:LAST_STATION_KEY];
+  if (playing) {
+    [playing stop];
+    [[ImageLoader loader] cancel:[[playing playingSong] art]];
   }
 
   playing = station;
+
+  if (station == nil) {
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:LAST_STATION_KEY];
+    lastImgSrc = nil;
+    return;
+  }
+
+  [[NSUserDefaults standardUserDefaults] setObject:[station stationId]
+                                            forKey:LAST_STATION_KEY];
+  
+  [[NSApp delegate] showLoader];
+
   if (playOnStart) {
     [station play];
   } else {
@@ -625,10 +632,13 @@ BOOL playOnStart = YES;
   return YES;
 }
 
-- (BOOL) validateToolbarItem:(NSToolbarItem *)toolbarItem {
+- (BOOL)validateToolbarItem:(NSToolbarItem *)toolbarItem {
   if (![[self pandora] isAuthenticated]) {
     return NO;
   }
+
+  if (toolbarItem == playpause || toolbarItem == nextSong || toolbarItem == tiredOfSong)
+    return (playing != nil);
 
   if (toolbarItem == like || toolbarItem == dislike) {
     return [playing playingSong] && ![playing shared];

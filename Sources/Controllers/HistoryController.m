@@ -24,17 +24,19 @@
 
 - (void) loadSavedSongs {
   NSLogd(@"loading saved songs");
-  NSString *saved_state = [[NSApp delegate] stateDirectory:@"history.savestate"];
-  if (saved_state == nil) { return; }
-  reader = [FileReader readerForFile:saved_state
-                   completionHandler:^(NSData *data, NSError *err) {
+  NSString *historySaveStatePath = [[NSApp delegate] stateDirectory:@"history.savestate"];
+  if (historySaveStatePath == nil) return;
+
+  reader = [FileReader readerForFile:historySaveStatePath completionHandler:^(NSData *data, NSError *err) {
     if (err) return;
     assert(data != nil);
+
     NSArray *s = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     for (Song *song in s) {
       if ([songs indexOfObject:song] == NSNotFound)
         [controller addObject:song];
     }
+
     reader = nil;
   }];
   [reader start];
@@ -174,8 +176,8 @@
   s.width = [defaults integerForKey:HIST_DRAWER_WIDTH];
   [drawer open];
   [drawer setContentSize:s];
-  [collection setMaxItemSize:NSMakeSize(227, 40)];
-  [collection setMinItemSize:NSMakeSize(40, 40)];
+  [collection setMaxItemSize:NSMakeSize(227, 41)];
+  [collection setMinItemSize:NSMakeSize(40, 41)];
   [self focus];
 }
 

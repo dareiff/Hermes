@@ -66,8 +66,7 @@
 }
 
 - (void) closeNewStationSheet {
-  [NSApp endSheet:newStationSheet];
-  [newStationSheet orderOut:self];
+  [window endSheet:newStationSheet];
 }
 
 - (void) showNewStationSheet {
@@ -92,7 +91,9 @@
     if (prev_view == view) {
       return;
     }
-    [[superview animator] replaceSubview:prev_view with:view];
+    [superview replaceSubview:prev_view with:view];
+    // FIXME: This otherwise looks nicer but it causes the toolbar to flash.
+    // [[superview animator] replaceSubview:prev_view with:view];
   } else {
     [superview addSubview:view];
   }
@@ -102,6 +103,8 @@
   frame.size.width = superFrame.size.width;
   frame.size.height = superFrame.size.height;
   [view setFrame:frame];
+
+  [self updateWindowTitle];
 }
 
 - (void) migrateDefaults:(NSUserDefaults*) defaults {
@@ -168,7 +171,7 @@
      addObserver:self
         selector:@selector(handlePandoraError:)
             name:PandoraDidErrorNotification
-          object:[[NSApp delegate] pandora]];
+          object:nil];
 
   [[NSNotificationCenter defaultCenter]
      addObserver:self
@@ -180,7 +183,7 @@
      addObserver:self
         selector:@selector(handlePandoraLoggedOut:)
             name:PandoraDidLogOutNotification
-          object:[[NSApp delegate] pandora]];
+          object:nil];
 
   [[NSNotificationCenter defaultCenter]
      addObserver:self
@@ -419,11 +422,11 @@
   [playback reset];
   [stations hideDrawer];
   [history hideDrawer];
+  [station editStation:nil];
 
   /* Remove our credentials */
   [self saveUsername:@"" password:@""];
   [auth show];
-  [self updateWindowTitle];
 }
 
 + (BOOL)restoreWindowWithIdentifier:(NSString *)identifier
@@ -660,15 +663,22 @@
   }
 }
 
-- (void) playbackStateChanged:(NSNotification*) not {
+- (void)playbackStateChanged:(NSNotification*) not {
   AudioStreamer *stream = [not object];
   if ([stream isPlaying]) {
-    [self updateWindowTitle];
     [playbackState setTitle:@"Pause"];
   } else {
     [playbackState setTitle:@"Play"];
   }
+  [self updateWindowTitle];
   [self updateStatusBarIconImage:nil];
+}
+
+- (BOOL)validateToolbarItem:(NSToolbarItem *)toolbarItem {
+  if (![[self pandora] isAuthenticated]) {
+    return NO;
+  }
+  return YES;
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
